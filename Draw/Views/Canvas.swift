@@ -1,8 +1,8 @@
 //
-//  ViewController.swift
+//  Canvas.swift
 //  Draw
 //
-//  Created by Tolerance on 2020/09/27.
+//  Created by Tolerance on 2020/09/28.
 //  Copyright © 2020 Tolerance. All rights reserved.
 //
 
@@ -10,21 +10,23 @@ import UIKit
 
 class Canvas: UIView {
     
+    //public function
+    func undo() {
+        _ = lines.popLast()
+        setNeedsDisplay()
+    }
+    
+    func clear() {
+        lines.removeAll()
+        setNeedsDisplay()
+    }
+    
+    fileprivate var lines = [[CGPoint]]()
+    
     override func draw(_ rect: CGRect) {
         super.draw(rect)
         
         guard let context = UIGraphicsGetCurrentContext() else { return }
-        
-        //here are my lines
-        //dummy data
-//        let startPoint = CGPoint(x: 0, y: 0)
-//        let endPoint = CGPoint(x: 100, y: 100)
-//        context.move(to: startPoint)
-//        context.addLine(to: endPoint)
-        
-//        line.forEach { (p) in
-//            <#code#>
-//        }
         
         context.setStrokeColor(UIColor.black.cgColor)
         context.setLineWidth(5)
@@ -42,7 +44,7 @@ class Canvas: UIView {
         context.strokePath()
     }
     
-    var lines = [[CGPoint]]()
+    
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         lines.append([CGPoint]())
@@ -57,23 +59,5 @@ class Canvas: UIView {
         lastLine.append(point)
         lines.append(lastLine)
         setNeedsDisplay()
-        
-//        var lastLine = lines.last
-//        lastLine?.append(point)
-        
     }
 }
-
-class ViewController: UIViewController {
-    
-    let canvas = Canvas()
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loading the view.
-        view.addSubview(canvas)
-        canvas.backgroundColor = .white
-        canvas.frame = view.frame
-    }
-}
-
