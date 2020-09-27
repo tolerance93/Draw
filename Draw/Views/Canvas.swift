@@ -10,6 +10,9 @@ import UIKit
 
 class Canvas: UIView {
     
+    fileprivate var strokeColor = UIColor.black
+    fileprivate var strokeWidth: Float = 1
+    
     //public function
     func undo() {
         _ = lines.popLast()
@@ -21,33 +24,39 @@ class Canvas: UIView {
         setNeedsDisplay()
     }
     
-    fileprivate var lines = [[CGPoint]]()
+    func setStrokeWidth(width: Float) {
+        self.strokeWidth = width
+    }
+    
+    func setStrokeColor(color: UIColor){
+        self.strokeColor = color
+    }
+    
+    fileprivate var lines = [Line]()
     
     override func draw(_ rect: CGRect) {
         super.draw(rect)
         
         guard let context = UIGraphicsGetCurrentContext() else { return }
-        
-        context.setStrokeColor(UIColor.black.cgColor)
-        context.setLineWidth(5)
         context.setLineCap(.butt)
         
         lines.forEach { (line) in
-            for (i, p) in line.enumerated() {
+            context.setStrokeColor(line.color.cgColor)
+            context.setLineWidth(CGFloat(line.strokeWidth))
+            context.setLineCap(.round)
+            for (i, p) in line.points.enumerated() {
                 if i == 0 {
                     context.move(to: p)
                 } else {
                     context.addLine(to: p)
                 }
             }
+            context.strokePath()
         }
-        context.strokePath()
     }
     
-    
-    
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        lines.append([CGPoint]())
+        lines.append(Line(strokeWidth: strokeWidth, color: strokeColor, points: []))
     }
     
     
@@ -56,7 +65,7 @@ class Canvas: UIView {
         guard let point = touches.first?.location(in: nil) else { return }
         
         guard var lastLine = lines.popLast() else { return }
-        lastLine.append(point)
+        lastLine.points.append(point)
         lines.append(lastLine)
         setNeedsDisplay()
     }
